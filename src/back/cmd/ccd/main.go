@@ -1,23 +1,28 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
 	"github.com/BenasB/tess-space-app/back/tess"
+	"github.com/BenasB/tess-space-app/back/utils"
 )
 
 func main() {
 	if len(os.Args) < 3 {
-		fmt.Println("Usage: go run . <input.fits> <output.png>")
-		return
+		log.Fatalln("Usage: go run . <input.fits> <output.png>")
 	}
 
 	fitsPath, pngPath := os.Args[1], os.Args[2]
-	if err := tess.ConvertFFIToPng(fitsPath, pngPath); err != nil {
-		log.Fatalf("Error: %v", err)
+
+	img, err := tess.ConvertFFIToImage(fitsPath)
+	if err != nil {
+		log.Fatalf("error converting ccd FFIs to PNG: %v", err)
 	}
 
-	fmt.Printf("Finished converting %s to %s\n", fitsPath, pngPath)
+	if err := utils.ExportImageToPng(img, pngPath); err != nil {
+		log.Fatalf("failed to export image to PNG: %v", err)
+	}
+
+	log.Printf("Finished converting ccd %s to %s\n", fitsPath, pngPath)
 }

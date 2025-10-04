@@ -24,11 +24,13 @@ func ExportImageToPng(image image.Image, filePath string) error {
 
 }
 
-func Tile2x2(topLeft, topRight, bottomLeft, bottomRight image.Image) (image.Image, error) {
+var zeroPoint = image.Point{0, 0}
+
+func Tile2x2(topLeft, topRight, bottomLeft, bottomRight *image.Gray) (*image.Gray, error) {
 	topLeftBounds := topLeft.Bounds()
 	if topLeftBounds != topRight.Bounds() ||
 		topLeftBounds != bottomLeft.Bounds() ||
-		topLeftBounds != bottomLeft.Bounds() {
+		topLeftBounds != bottomRight.Bounds() {
 		return nil, fmt.Errorf("all images must have the same dimensions")
 	}
 
@@ -37,17 +39,38 @@ func Tile2x2(topLeft, topRight, bottomLeft, bottomRight image.Image) (image.Imag
 
 	combinedImg := image.NewGray(image.Rect(0, 0, width*2, height*2))
 
-	topLeftRect := image.Rect(0, 0, width, height)
-	topRightRect := image.Rect(width, 0, width*2, height)
-	bottomLeftRect := image.Rect(0, height, width, height*2)
-	bottomRightRect := image.Rect(width, height, width*2, height*2)
-
-	draw.Draw(combinedImg, topLeftRect, topLeft, image.Point{0, 0}, draw.Src)
-	draw.Draw(combinedImg, topRightRect, topRight, image.Point{0, 0}, draw.Src)
-	draw.Draw(combinedImg, bottomLeftRect, bottomLeft, image.Point{0, 0}, draw.Src)
-	draw.Draw(combinedImg, bottomRightRect, bottomRight, image.Point{0, 0}, draw.Src)
+	draw.Draw(combinedImg, image.Rect(0, 0, width, height), topLeft, zeroPoint, draw.Src)
+	draw.Draw(combinedImg, image.Rect(width, 0, width*2, height), topRight, zeroPoint, draw.Src)
+	draw.Draw(combinedImg, image.Rect(0, height, width, height*2), bottomLeft, zeroPoint, draw.Src)
+	draw.Draw(combinedImg, image.Rect(width, height, width*2, height*2), bottomRight, zeroPoint, draw.Src)
 
 	return combinedImg, nil
+}
+
+func Stack(images ...*image.Gray) (*image.Gray, error) {
+	if len(images) == 0 {
+		return nil, fmt.Errorf("no images provided to stack")
+	}
+
+	width := images[0].Bounds().Dx()
+	totalHeight := 0
+
+	for i, img := range images {
+		if img.Bounds().Dx() != width {
+			return nil, fmt.Errorf("image %d has a different width: expected %d, got %d", i, width, img.Bounds().Dx())
+		}
+		totalHeight += img.Bounds().Dy()
+	}
+
+	stackedImg := image.NewGray(image.Rect(0, 0, width, totalHeight))
+	currentY := 0
+	for _, img := range images {
+		height := img.Bounds().Dy()
+		draw.Draw(stackedImg, image.Rect(0, currentY, width, currentY+height), img, zeroPoint, draw.Src)
+		currentY += height
+	}
+
+	return stackedImg, nil
 }
 
 func ConvertValuesToGrayscaleImage(

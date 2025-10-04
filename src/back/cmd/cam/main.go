@@ -1,28 +1,34 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
 	"github.com/BenasB/tess-space-app/back/tess"
+	"github.com/BenasB/tess-space-app/back/utils"
 )
 
 func main() {
 	if len(os.Args) < 6 {
-		fmt.Println("Usage: go run . <input1.fits> <input2.fits> <input3.fits> <input4.fits> <output.png>")
-		return
+		log.Fatalln("Usage: go run . <input1.fits> <input2.fits> <input3.fits> <input4.fits> <output.png>")
 	}
 
 	fitPaths := os.Args[1:5]
 	pngPath := os.Args[5]
 
 	var fitPathsArray [4]string
-	copy(fitPathsArray[:], fitPaths)
-
-	if err := tess.ConvertCamFFIsToPng(fitPathsArray, pngPath); err != nil {
-		log.Fatalf("Error: %v", err)
+	for i := range 4 {
+		fitPathsArray[i] = fitPaths[i]
 	}
 
-	fmt.Printf("Finished converting %s to %s\n", fitPaths, pngPath)
+	img, err := tess.ConvertCamFFIsToImage(fitPathsArray)
+	if err != nil {
+		log.Fatalf("error converting cam FFIs to PNG: %v", err)
+	}
+
+	if err := utils.ExportImageToPng(img, pngPath); err != nil {
+		log.Fatalf("failed to export image to PNG: %v", err)
+	}
+
+	log.Printf("Finished converting cam %s to %s\n", fitPaths, pngPath)
 }
