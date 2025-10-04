@@ -32,7 +32,7 @@ func NewDownloadClient(storage *Storage) *DownloadClient {
 	}
 }
 
-func (c *DownloadClient) DownloadFile(resource string) (string, error) {
+func (c *DownloadClient) DownloadSingleFile(resource string) (string, error) {
 	outputPath := c.getLocalDownloadPath(resource)
 	if found := c.storage.Get(resource); found {
 		return outputPath, nil

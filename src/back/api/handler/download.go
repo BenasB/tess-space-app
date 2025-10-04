@@ -4,20 +4,25 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/BenasB/tess-space-app/back/tess"
 	"github.com/BenasB/tess-space-app/back/utils"
 )
 
-func (h *ApiHandler) DownloadImage(w http.ResponseWriter, r *http.Request) {
+func (h *ApiHandler) DownloadCCD(w http.ResponseWriter, r *http.Request) {
 	resource := r.URL.Query().Get("resource")
 	if resource == "" {
 		log.Printf("Missing resource parameter")
 		http.Error(w, "Missing resource parameter", http.StatusBadRequest)
 		return
+	} else if !strings.Contains(resource, "_ffic.fits") {
+		log.Printf("Invalid resource parameter: %s", resource)
+		http.Error(w, "Invalid resource parameter, must contain '_ffic.fits'", http.StatusBadRequest)
+		return
 	}
 
-	localPath, err := h.MastClient.DownloadFile(resource)
+	localPath, err := h.MastClient.DownloadSingleFile(resource)
 	if err != nil {
 		log.Printf("Failed to download file: %v", err)
 		http.Error(w, fmt.Sprintf("Failed to download file: %s", err.Error()), http.StatusInternalServerError)
