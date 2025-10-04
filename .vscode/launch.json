@@ -2,14 +2,28 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Convert a single FFI to PNG",
+            "name": "Convert single CCD FFI to PNG",
             "type": "go",
             "request": "launch",
             "mode": "debug",
-            "program": "${workspaceFolder}/src/back/cmd/main.go",
+            "program": "${workspaceFolder}/src/back/cmd/ccd/main.go",
             "args": [
-                "./inputs/tess2018206192942-s0001-4-1-0120-s_ffic.fits",
-                "outputs/file.png"
+                "../inputs/tess2018206192942-s0001-4-1-0120-s_ffic.fits",
+                "../outputs/ccd.png"
+            ]
+        },
+        {
+            "name": "Convert single camera FFIs to PNG",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/src/back/cmd/cam/main.go",
+            "args": [
+                "../inputs/tess2018206192942-s0001-4-1-0120-s_ffic.fits",
+                "../inputs/tess2018206192942-s0001-4-2-0120-s_ffic.fits",
+                "../inputs/tess2018206192942-s0001-4-3-0120-s_ffic.fits",
+                "../inputs/tess2018206192942-s0001-4-4-0120-s_ffic.fits",
+                "../outputs/cam.png"
             ]
         },
     ]
