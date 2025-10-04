@@ -5,16 +5,45 @@ import (
 	"image"
 	"image/color"
 	"image/draw"
-	_ "image/png" // Import for side-effects to register PNG format
+	"image/png"
+	"os"
+	"sync"
 
-	"github.com/anthonynsimon/bild/imgio"
 	"github.com/anthonynsimon/bild/transform"
 )
 
+type pngPool struct {
+	pool *sync.Pool
+}
+
+func (p *pngPool) Get() *png.EncoderBuffer {
+	return p.pool.Get().(*png.EncoderBuffer)
+}
+
+func (p *pngPool) Put(b *png.EncoderBuffer) {
+	p.pool.Put(b)
+}
+
+var encoderPool = &pngPool{
+	pool: &sync.Pool{New: func() any { return new(png.EncoderBuffer) }},
+}
+
+var pngEncoder = png.Encoder{
+	CompressionLevel: png.NoCompression,
+	BufferPool:       encoderPool,
+}
+
 func ExportImageToPng(img image.Image, filePath string) error {
-	if err := imgio.Save(filePath, img, imgio.PNGEncoder()); err != nil {
-		return fmt.Errorf("failed to save image to %s: %w", filePath, err)
+	f, err := os.Create(filePath)
+	if err != nil {
+		return fmt.Errorf("failed to create file %s: %w", filePath, err)
 	}
+	defer f.Close()
+
+	if err := pngEncoder.Encode(f, img); err != nil {
+		return fmt.Errorf("failed to encode image to %s: %w", filePath, err)
+	}
+
 	return nil
 }
 
@@ -28,15 +57,22 @@ func Tile2x2(topLeft, topRight, bottomLeft, bottomRight *image.RGBA) (*image.RGB
 		return nil, fmt.Errorf("all images must have the same dimensions")
 	}
 
-	width := topLeft.Bounds().Dx()
-	height := topLeft.Bounds().Dy()
-
+	width, height := topLeftBounds.Dx(), topLeftBounds.Dy()
 	combinedImg := image.NewRGBA(image.Rect(0, 0, width*2, height*2))
 
-	draw.Draw(combinedImg, image.Rect(0, 0, width, height), topLeft, zeroPoint, draw.Src)
-	draw.Draw(combinedImg, image.Rect(width, 0, width*2, height), topRight, zeroPoint, draw.Src)
-	draw.Draw(combinedImg, image.Rect(0, height, width, height*2), bottomLeft, zeroPoint, draw.Src)
-	draw.Draw(combinedImg, image.Rect(width, height, width*2, height*2), bottomRight, zeroPoint, draw.Src)
+	var wg sync.WaitGroup
+	wg.Add(4)
+	processingFn := func(rect image.Rectangle, img *image.RGBA) {
+		defer wg.Done()
+		draw.Draw(combinedImg, rect, img, zeroPoint, draw.Src)
+	}
+
+	go processingFn(image.Rect(0, 0, width, height), topLeft)
+	go processingFn(image.Rect(width, 0, width*2, height), topRight)
+	go processingFn(image.Rect(0, height, width, height*2), bottomLeft)
+	go processingFn(image.Rect(width, height, width*2, height*2), bottomRight)
+
+	wg.Wait()
 
 	return combinedImg, nil
 }
@@ -57,12 +93,19 @@ func Stack(images ...*image.RGBA) (*image.RGBA, error) {
 	}
 
 	stackedImg := image.NewRGBA(image.Rect(0, 0, width, totalHeight))
+	wg := sync.WaitGroup{}
 	currentY := 0
+
 	for _, img := range images {
-		height := img.Bounds().Dy()
-		draw.Draw(stackedImg, image.Rect(0, currentY, width, currentY+height), img, zeroPoint, draw.Src)
-		currentY += height
+		wg.Add(1)
+		go func(imgToDraw *image.RGBA, yOffset int) {
+			defer wg.Done()
+			height := imgToDraw.Bounds().Dy()
+			draw.Draw(stackedImg, image.Rect(0, yOffset, width, yOffset+height), imgToDraw, zeroPoint, draw.Src)
+		}(img, currentY)
+		currentY += img.Bounds().Dy()
 	}
+	wg.Wait()
 	return stackedImg, nil
 }
 
@@ -77,22 +120,42 @@ func ConvertValuesToRGBAImage(
 		scale = 255.0 / (maxValue - minValue)
 	}
 
-	for y := range originalHeight {
-		for x := range originalWidth {
-			sourceIdx := y*originalWidth + x
-			pixelValue := imageData[sourceIdx]
+	const workersCount = 4
+	wg := sync.WaitGroup{}
+	rowsPerWorker := originalHeight / workersCount
 
-			pixelValue = Clamp(pixelValue, minValue, maxValue)
-			grayValue := uint8((pixelValue - minValue) * scale)
-			rgbaColor := GetFalseColor(grayValue)
-			destIdx := y*img.Stride + x*4
+	processRows := func(startY, endY int) {
+		defer wg.Done()
+		for y := startY; y < endY; y++ {
+			for x := range originalWidth {
+				sourceIdx := y*originalWidth + x
+				pixelValue := imageData[sourceIdx]
 
-			img.Pix[destIdx+0] = rgbaColor.R
-			img.Pix[destIdx+1] = rgbaColor.G
-			img.Pix[destIdx+2] = rgbaColor.B
-			img.Pix[destIdx+3] = rgbaColor.A
+				pixelValue = Clamp(pixelValue, minValue, maxValue)
+				grayValue := uint8((pixelValue - minValue) * scale)
+				rgbaColor := GetFalseColor(grayValue)
+
+				destIdx := y*img.Stride + x*4
+				img.Pix[destIdx+0] = rgbaColor.R
+				img.Pix[destIdx+1] = rgbaColor.G
+				img.Pix[destIdx+2] = rgbaColor.B
+				img.Pix[destIdx+3] = rgbaColor.A
+			}
 		}
 	}
+
+	wg.Add(workersCount)
+	for i := range workersCount {
+		startY := i * rowsPerWorker
+		endY := startY + rowsPerWorker
+		if i == workersCount-1 {
+			endY = originalHeight
+		}
+
+		go processRows(startY, endY)
+	}
+
+	wg.Wait()
 	return img, nil
 }
 

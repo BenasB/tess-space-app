@@ -6,5 +6,3 @@ require (
 	github.com/anthonynsimon/bild v0.14.0
 	github.com/siravan/fits v0.0.0-20140212211533-ab9b19d2265a
 )
-
-require golang.org/x/image v0.18.0 // indirect
