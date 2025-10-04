@@ -10,7 +10,7 @@ import (
 const minValue = 0   // about min 2 percentile in cam4 ccd1 t0
 const maxValue = 800 // about max 99 percentile in cam4 ccd1 t0
 
-func ConvertFFIToImage(fitsPath string) (*image.Gray, error) {
+func ConvertFFIToImage(fitsPath string) (*image.RGBA, error) {
 	fitsUnits, err := utils.GetFitsUnitsFromFile(fitsPath)
 	if err != nil || len(fitsUnits) < 2 {
 		return nil, fmt.Errorf("failed to open FITS file: %w", err)
@@ -22,7 +22,7 @@ func ConvertFFIToImage(fitsPath string) (*image.Gray, error) {
 		return nil, fmt.Errorf("failed to map FITS unit to image values: %w", err)
 	}
 
-	return utils.ConvertValuesToGrayscaleImage(
+	return utils.ConvertValuesToRGBAImage(
 		width,
 		height,
 		imageData,
@@ -31,8 +31,8 @@ func ConvertFFIToImage(fitsPath string) (*image.Gray, error) {
 	)
 }
 
-func ConvertCamFFIsToImage(fitsPaths [4]string) (*image.Gray, error) {
-	ccds := utils.MapFiltered(fitsPaths[:], func(fitsPath string) (*image.Gray, bool) {
+func ConvertCamFFIsToImage(fitsPaths [4]string) (*image.RGBA, error) {
+	ccds := utils.MapFiltered(fitsPaths[:], func(fitsPath string) (*image.RGBA, bool) {
 		ccd, err := ConvertFFIToImage(fitsPath)
 		if err != nil {
 			return nil, false
@@ -52,8 +52,8 @@ func ConvertCamFFIsToImage(fitsPaths [4]string) (*image.Gray, error) {
 	)
 }
 
-func ConvertSectorFFIsToImage(fitsPaths [4][4]string) (*image.Gray, error) {
-	cams := utils.MapFiltered(fitsPaths[:], func(fitsPaths [4]string) (*image.Gray, bool) {
+func ConvertSectorFFIsToImage(fitsPaths [4][4]string) (*image.RGBA, error) {
+	cams := utils.MapFiltered(fitsPaths[:], func(fitsPaths [4]string) (*image.RGBA, bool) {
 		cam, err := ConvertCamFFIsToImage(fitsPaths)
 		if err != nil {
 			return nil, false

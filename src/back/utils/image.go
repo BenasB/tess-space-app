@@ -3,30 +3,24 @@ package utils
 import (
 	"fmt"
 	"image"
+	"image/color"
 	"image/draw"
-	"image/png"
-	"os"
+	_ "image/png" // Import for side-effects to register PNG format
+
+	"github.com/anthonynsimon/bild/imgio"
+	"github.com/anthonynsimon/bild/transform"
 )
 
-func ExportImageToPng(image image.Image, filePath string) error {
-	file, err := os.Create(filePath)
-	if err != nil {
-		return fmt.Errorf("failed to create new file %s: %w", filePath, err)
+func ExportImageToPng(img image.Image, filePath string) error {
+	if err := imgio.Save(filePath, img, imgio.PNGEncoder()); err != nil {
+		return fmt.Errorf("failed to save image to %s: %w", filePath, err)
 	}
-
-	defer file.Close()
-	err = png.Encode(file, image)
-	if err != nil {
-		return fmt.Errorf("failed to encode image to PNG: %w", err)
-	}
-
 	return nil
-
 }
 
 var zeroPoint = image.Point{0, 0}
 
-func Tile2x2(topLeft, topRight, bottomLeft, bottomRight *image.Gray) (*image.Gray, error) {
+func Tile2x2(topLeft, topRight, bottomLeft, bottomRight *image.RGBA) (*image.RGBA, error) {
 	topLeftBounds := topLeft.Bounds()
 	if topLeftBounds != topRight.Bounds() ||
 		topLeftBounds != bottomLeft.Bounds() ||
@@ -37,7 +31,7 @@ func Tile2x2(topLeft, topRight, bottomLeft, bottomRight *image.Gray) (*image.Gra
 	width := topLeft.Bounds().Dx()
 	height := topLeft.Bounds().Dy()
 
-	combinedImg := image.NewGray(image.Rect(0, 0, width*2, height*2))
+	combinedImg := image.NewRGBA(image.Rect(0, 0, width*2, height*2))
 
 	draw.Draw(combinedImg, image.Rect(0, 0, width, height), topLeft, zeroPoint, draw.Src)
 	draw.Draw(combinedImg, image.Rect(width, 0, width*2, height), topRight, zeroPoint, draw.Src)
@@ -47,7 +41,7 @@ func Tile2x2(topLeft, topRight, bottomLeft, bottomRight *image.Gray) (*image.Gra
 	return combinedImg, nil
 }
 
-func Stack(images ...*image.Gray) (*image.Gray, error) {
+func Stack(images ...*image.RGBA) (*image.RGBA, error) {
 	if len(images) == 0 {
 		return nil, fmt.Errorf("no images provided to stack")
 	}
@@ -62,23 +56,22 @@ func Stack(images ...*image.Gray) (*image.Gray, error) {
 		totalHeight += img.Bounds().Dy()
 	}
 
-	stackedImg := image.NewGray(image.Rect(0, 0, width, totalHeight))
+	stackedImg := image.NewRGBA(image.Rect(0, 0, width, totalHeight))
 	currentY := 0
 	for _, img := range images {
 		height := img.Bounds().Dy()
 		draw.Draw(stackedImg, image.Rect(0, currentY, width, currentY+height), img, zeroPoint, draw.Src)
 		currentY += height
 	}
-
 	return stackedImg, nil
 }
 
-func ConvertValuesToGrayscaleImage(
+func ConvertValuesToRGBAImage(
 	originalWidth, originalHeight int,
 	imageData []float32,
 	minValue, maxValue float32,
-) (*image.Gray, error) {
-	img := image.NewGray(image.Rect(0, 0, originalWidth, originalHeight))
+) (*image.RGBA, error) {
+	img := image.NewRGBA(image.Rect(0, 0, originalWidth, originalHeight))
 	scale := float32(0)
 	if maxValue-minValue > 0 {
 		scale = 255.0 / (maxValue - minValue)
@@ -86,23 +79,29 @@ func ConvertValuesToGrayscaleImage(
 
 	for y := range originalHeight {
 		for x := range originalWidth {
-			pixelValue := imageData[y*originalWidth+x]
+			sourceIdx := y*originalWidth + x
+			pixelValue := imageData[sourceIdx]
+
 			pixelValue = Clamp(pixelValue, minValue, maxValue)
-			scaledValue := uint8((pixelValue - minValue) * scale)
-			img.Pix[y*img.Stride+x] = scaledValue
+			grayValue := uint8((pixelValue - minValue) * scale)
+			rgbaColor := GetFalseColor(grayValue)
+			destIdx := y*img.Stride + x*4
+
+			img.Pix[destIdx+0] = rgbaColor.R
+			img.Pix[destIdx+1] = rgbaColor.G
+			img.Pix[destIdx+2] = rgbaColor.B
+			img.Pix[destIdx+3] = rgbaColor.A
 		}
 	}
-
 	return img, nil
 }
 
-func TransformRotate180(src *image.Gray) *image.Gray {
-	bounds := src.Bounds()
-	dst := image.NewGray(bounds)
-	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
-		for x := bounds.Min.X; x < bounds.Max.X; x++ {
-			dst.Set(bounds.Max.X-x-1, bounds.Max.Y-y-1, src.At(x, y))
-		}
-	}
-	return dst
+func TransformRotate180(src *image.RGBA) *image.RGBA {
+	return transform.Rotate(src, 180, nil)
+}
+
+func GetFalseColor(value uint8) color.RGBA {
+	g := min(uint8(-0.00043*float32(value)*float32(value)+1.087*float32(value)+3.633), 255)
+	b := min(uint8(-0.00080*float32(value)*float32(value)+1.119*float32(value)+17.232), 255)
+	return color.RGBA{value, g, b, 255}
 }
