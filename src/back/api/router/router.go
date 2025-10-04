@@ -1,27 +1,19 @@
-package main
+package router
 
 import (
-	"fmt"
-	"log"
 	"net/http"
-	"time"
+
+	"github.com/BenasB/tess-space-app/back/api/handler"
+	"github.com/BenasB/tess-space-app/back/mast"
 )
 
-func greet(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello World! %s", time.Now())
-}
+func New(mdc *mast.DownloadClient) http.Handler {
+	apiHandler := &handler.ApiHandler{MastClient: mdc}
 
-func main() {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", greet)
+	mux.HandleFunc("/", apiHandler.Greet)
 
-	http.Handle("/", corsMiddleware(mux))
-
-	listenAddress := ":8081"
-	log.Printf("Starting to listen on: %s\n", listenAddress)
-	if err := http.ListenAndServe(listenAddress, nil); err != nil {
-		log.Fatalf("ListenAndServe failed: %v", err)
-	}
+	return corsMiddleware(mux)
 }
 
 func corsMiddleware(next http.Handler) http.Handler {

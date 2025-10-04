@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	cacheDir      = "./cache/mast"
+	cacheDir      = "../cache/mast"
 	cacheDuration = 2 * time.Hour
 )
 

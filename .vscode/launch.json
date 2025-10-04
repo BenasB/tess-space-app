@@ -6,7 +6,7 @@
             "type": "go",
             "request": "launch",
             "mode": "debug",
-            "program": "${workspaceFolder}/src/back/main.go"
+            "program": "${workspaceFolder}/src/back/cmd/webapp/main.go"
         },
         {
             "name": "Convert single CCD FFI to PNG",
