@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/BenasB/tess-space-app/back/fits"
+	"github.com/BenasB/tess-space-app/back/tess"
 )
 
 func main() {
@@ -14,10 +14,8 @@ func main() {
 		return
 	}
 
-	fitsPath := os.Args[1]
-	pngPath := os.Args[2]
-
-	if err := fits.ConvertFITSToPNG(fitsPath, pngPath); err != nil {
+	fitsPath, pngPath := os.Args[1], os.Args[2]
+	if err := tess.ConvertFFIToPng(fitsPath, pngPath); err != nil {
 		log.Fatalf("Error: %v", err)
 	}
 
