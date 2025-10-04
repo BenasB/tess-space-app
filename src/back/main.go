@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 )
@@ -17,8 +18,10 @@ func main() {
 	http.Handle("/", corsMiddleware(mux))
 
 	listenAddress := ":8081"
-	fmt.Printf("Starting to listen on: %s\n", listenAddress)
-	http.ListenAndServe(listenAddress, nil)
+	log.Printf("Starting to listen on: %s\n", listenAddress)
+	if err := http.ListenAndServe(listenAddress, nil); err != nil {
+		log.Fatalf("ListenAndServe failed: %v", err)
+	}
 }
 
 func corsMiddleware(next http.Handler) http.Handler {

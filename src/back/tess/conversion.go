@@ -7,8 +7,8 @@ import (
 	"github.com/BenasB/tess-space-app/back/utils"
 )
 
-const minValue = 0   // about min 2 percentile in cam4 ccd1 t0
-const maxValue = 800 // about max 99 percentile in cam4 ccd1 t0
+const minValue = 0   // consistently about min 2 percentile
+const maxValue = 900 // slightly higher than 99 percentile in sector1, but lower than 99 percentile in cam4 ccd1
 
 func ConvertFFIToImage(fitsPath string) (*image.RGBA, error) {
 	fitsUnits, err := utils.GetFitsUnitsFromFile(fitsPath)

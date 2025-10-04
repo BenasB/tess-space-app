@@ -4,5 +4,7 @@ go 1.25.0
 
 require (
 	github.com/anthonynsimon/bild v0.14.0
+	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/siravan/fits v0.0.0-20140212211533-ab9b19d2265a
+	golang.org/x/sync v0.17.0
 )
