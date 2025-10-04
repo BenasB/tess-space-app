@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"bytes"
 	"fmt"
 	"image"
 	"image/color"
@@ -45,6 +46,14 @@ func ExportImageToPng(img image.Image, filePath string) error {
 	}
 
 	return nil
+}
+
+func ExportImageToPngBuffer(img image.Image) (*bytes.Buffer, error) {
+	buffer := new(bytes.Buffer)
+	if err := png.Encode(buffer, img); err != nil {
+		return nil, fmt.Errorf("failed to encode image to png buffer: %w", err)
+	}
+	return buffer, nil
 }
 
 var zeroPoint = image.Point{0, 0}

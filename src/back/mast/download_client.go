@@ -4,12 +4,17 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/patrickmn/go-cache"
 	"golang.org/x/sync/singleflight"
+)
+
+const (
+	downloadDir         = "./cache/mast"
+	downloadUrlTemplate = "https://mast.stsci.edu/api/v0.1/Download/file/?uri=mast:TESS/product/%s"
 )
 
 type DownloadClient struct {
@@ -27,37 +32,29 @@ func NewDownloadClient(storage *Storage) *DownloadClient {
 	}
 }
 
-func (c *DownloadClient) DownloadFile(url string) (string, error) {
-	nameParts := strings.Split(url, "/")
-	fileName := nameParts[len(nameParts)-1]
-
-	if found := c.storage.Get(fileName); found {
-		return fileName, nil
+func (c *DownloadClient) DownloadFile(resource string) (string, error) {
+	outputPath := c.getLocalDownloadPath(resource)
+	if found := c.storage.Get(resource); found {
+		return outputPath, nil
 	}
 
+	url := fmt.Sprintf(downloadUrlTemplate, url.QueryEscape(resource))
 	_, err, _ := c.downloadGroup.Do(url, func() (any, error) {
-		if err := c.download(url); err != nil {
+		if err := c.download(url, outputPath); err != nil {
 			return nil, err
 		}
 
-		c.storage.Store(fileName, true, cache.DefaultExpiration)
+		c.storage.Store(resource, true, cache.DefaultExpiration)
 		return nil, nil
 	})
 	if err != nil {
 		return "", err
 	}
 
-	return fileName, err
+	return outputPath, err
 }
 
-func (c *DownloadClient) download(url string) error {
-	name := strings.Split(url, "/")
-	if len(name) == 0 {
-		return fmt.Errorf("invalid URL: %s", url)
-	}
-	fileName := name[len(name)-1]
-	outputPath := filepath.Join(cacheDir, fileName)
-
+func (c *DownloadClient) download(url string, outputPath string) error {
 	var fileExists bool
 	fileInfo, err := os.Stat(outputPath)
 	if err == nil {
@@ -103,4 +100,8 @@ func (c *DownloadClient) download(url string) error {
 	}
 
 	return nil
+}
+
+func (c *DownloadClient) getLocalDownloadPath(resource string) string {
+	return filepath.Join(downloadDir, resource)
 }

@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	cacheDir      = "../cache/mast"
 	cacheDuration = 2 * time.Hour
+	cacheDir      = downloadDir
 )
 
 type Storage struct {

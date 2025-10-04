@@ -12,6 +12,7 @@ func New(mdc *mast.DownloadClient) http.Handler {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", apiHandler.Greet)
+	mux.HandleFunc("/downloadImage", apiHandler.DownloadImage)
 
 	return corsMiddleware(mux)
 }
