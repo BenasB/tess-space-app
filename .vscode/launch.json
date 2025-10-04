@@ -8,7 +8,7 @@
             "mode": "debug",
             "program": "${workspaceFolder}/src/back/cmd/ccd/main.go",
             "args": [
-                "../inputs/tess2018206192942-s0001-4-1-0120-s_ffic.fits",
+                "../inputs/tess2018230002941-s0001-4-1-0120-s_ffic.fits",
                 "../outputs/ccd.png"
             ]
         },
@@ -19,10 +19,10 @@
             "mode": "debug",
             "program": "${workspaceFolder}/src/back/cmd/cam/main.go",
             "args": [
-                "../inputs/tess2018206192942-s0001-4-1-0120-s_ffic.fits",
-                "../inputs/tess2018206192942-s0001-4-2-0120-s_ffic.fits",
-                "../inputs/tess2018206192942-s0001-4-3-0120-s_ffic.fits",
-                "../inputs/tess2018206192942-s0001-4-4-0120-s_ffic.fits",
+                "../inputs/tess2018230002941-s0001-4-1-0120-s_ffic.fits",
+                "../inputs/tess2018230002941-s0001-4-2-0120-s_ffic.fits",
+                "../inputs/tess2018230002941-s0001-4-3-0120-s_ffic.fits",
+                "../inputs/tess2018230002941-s0001-4-4-0120-s_ffic.fits",
                 "../outputs/cam.png"
             ]
         },
@@ -33,22 +33,22 @@
             "mode": "debug",
             "program": "${workspaceFolder}/src/back/cmd/sector/main.go",
             "args": [
-                "../inputs/tess2018206192942-s0001-1-1-0120-s_ffic.fits",
-                "../inputs/tess2018206192942-s0001-1-2-0120-s_ffic.fits",
-                "../inputs/tess2018206192942-s0001-1-3-0120-s_ffic.fits",
-                "../inputs/tess2018206192942-s0001-1-4-0120-s_ffic.fits",
-                "../inputs/tess2018206192942-s0001-2-1-0120-s_ffic.fits",
-                "../inputs/tess2018206192942-s0001-2-2-0120-s_ffic.fits",
-                "../inputs/tess2018206192942-s0001-2-3-0120-s_ffic.fits",
-                "../inputs/tess2018206192942-s0001-2-4-0120-s_ffic.fits",
-                "../inputs/tess2018206192942-s0001-3-1-0120-s_ffic.fits",
-                "../inputs/tess2018206192942-s0001-3-2-0120-s_ffic.fits",
-                "../inputs/tess2018206192942-s0001-3-3-0120-s_ffic.fits",
-                "../inputs/tess2018206192942-s0001-3-4-0120-s_ffic.fits",
-                "../inputs/tess2018206192942-s0001-4-1-0120-s_ffic.fits",
-                "../inputs/tess2018206192942-s0001-4-2-0120-s_ffic.fits",
-                "../inputs/tess2018206192942-s0001-4-3-0120-s_ffic.fits",
-                "../inputs/tess2018206192942-s0001-4-4-0120-s_ffic.fits",
+                "../inputs/tess2018230002941-s0001-1-1-0120-s_ffic.fits",
+                "../inputs/tess2018230002941-s0001-1-2-0120-s_ffic.fits",
+                "../inputs/tess2018230002941-s0001-1-3-0120-s_ffic.fits",
+                "../inputs/tess2018230002941-s0001-1-4-0120-s_ffic.fits",
+                "../inputs/tess2018230002941-s0001-2-1-0120-s_ffic.fits",
+                "../inputs/tess2018230002941-s0001-2-2-0120-s_ffic.fits",
+                "../inputs/tess2018230002941-s0001-2-3-0120-s_ffic.fits",
+                "../inputs/tess2018230002941-s0001-2-4-0120-s_ffic.fits",
+                "../inputs/tess2018230002941-s0001-3-1-0120-s_ffic.fits",
+                "../inputs/tess2018230002941-s0001-3-2-0120-s_ffic.fits",
+                "../inputs/tess2018230002941-s0001-3-3-0120-s_ffic.fits",
+                "../inputs/tess2018230002941-s0001-3-4-0120-s_ffic.fits",
+                "../inputs/tess2018230002941-s0001-4-1-0120-s_ffic.fits",
+                "../inputs/tess2018230002941-s0001-4-2-0120-s_ffic.fits",
+                "../inputs/tess2018230002941-s0001-4-3-0120-s_ffic.fits",
+                "../inputs/tess2018230002941-s0001-4-4-0120-s_ffic.fits",
                 "../outputs/sector.png"
             ]
         },
