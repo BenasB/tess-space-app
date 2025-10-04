@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Open a local file",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/src/back/cmd/main.go",
+            "args": [
+                "tess2018206192942-s0001-4-1-0120-s_ffic.fits",
+                "file.png"
+            ]
+        },
+    ]
+}
