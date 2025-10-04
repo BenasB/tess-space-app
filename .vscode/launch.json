@@ -23,7 +23,8 @@
                 "../inputs/tess2018230002941-s0001-4-2-0120-s_ffic.fits",
                 "../inputs/tess2018230002941-s0001-4-3-0120-s_ffic.fits",
                 "../inputs/tess2018230002941-s0001-4-4-0120-s_ffic.fits",
-                "../outputs/cam.png"
+                "../outputs/cam.png",
+                "2"
             ]
         },
         {
@@ -49,7 +50,8 @@
                 "../inputs/tess2018230002941-s0001-4-2-0120-s_ffic.fits",
                 "../inputs/tess2018230002941-s0001-4-3-0120-s_ffic.fits",
                 "../inputs/tess2018230002941-s0001-4-4-0120-s_ffic.fits",
-                "../outputs/sector.png"
+                "../outputs/sector.png",
+                "4"
             ]
         },
     ]

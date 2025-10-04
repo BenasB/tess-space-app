@@ -29,7 +29,7 @@ var encoderPool = &pngPool{
 }
 
 var pngEncoder = png.Encoder{
-	CompressionLevel: png.NoCompression,
+	CompressionLevel: png.BestSpeed,
 	BufferPool:       encoderPool,
 }
 
@@ -167,4 +167,10 @@ func GetFalseColor(value uint8) color.RGBA {
 	g := min(uint8(-0.00043*float32(value)*float32(value)+1.087*float32(value)+3.633), 255)
 	b := min(uint8(-0.00080*float32(value)*float32(value)+1.119*float32(value)+17.232), 255)
 	return color.RGBA{value, g, b, 255}
+}
+
+func Downsample(src *image.RGBA, scale int) *image.RGBA {
+	width := src.Bounds().Dx() / scale
+	height := src.Bounds().Dy() / scale
+	return transform.Resize(src, width, height, transform.Linear)
 }
