@@ -55,10 +55,9 @@ func (c *DownloadClient) DownloadSingleFile(resource string) (string, error) {
 }
 
 func (c *DownloadClient) download(url string, outputPath string) error {
-	var fileExists bool
-	fileInfo, err := os.Stat(outputPath)
-	if err == nil {
-		fileExists = true
+	if _, err := os.Stat(outputPath); err == nil {
+		// File already exists
+		return nil
 	} else if !os.IsNotExist(err) {
 		return fmt.Errorf("could not stat output file: %w", err)
 	}
@@ -68,18 +67,8 @@ func (c *DownloadClient) download(url string, outputPath string) error {
 		return fmt.Errorf("failed to create GET request: %v", err)
 	}
 
-	var file *os.File
-	var openFlags int
-
-	if fileExists {
-		req.Header.Set("Range", fmt.Sprintf("bytes=%d-", fileInfo.Size()))
-		openFlags = os.O_APPEND | os.O_WRONLY
-	} else {
-		req.Header.Set("Range", "bytes=0-")
-		openFlags = os.O_CREATE | os.O_WRONLY
-	}
-
-	file, err = os.OpenFile(outputPath, openFlags, 0644)
+	const createOpenFlags = os.O_CREATE | os.O_WRONLY
+	file, err := os.OpenFile(outputPath, createOpenFlags, 0644)
 	if err != nil {
 		return fmt.Errorf("could not open or create file: %w", err)
 	}
