@@ -1,34 +1,18 @@
-import { useMemo } from 'react';
-import targetData from './targets.json';
 
-type TargetData = {
-    [sector: string]: {
-        [camera: string]: {
-            [ccd: string]: any[];
-        };
-    };
-};
 
 interface RightPaneProps {
     sector: number
     camera: number
     ccd: number
+    targets: any[]
 }
 
 const RightPane: React.FC<RightPaneProps> = (props) => {
-    const currentTargets =
-        (targetData as TargetData)?.[props.sector]?.[props.camera]?.[props.ccd] || [];
-
-    const sortedTargets = useMemo(() => {
-        return currentTargets.sort((a, b) => b.Tmag - a.Tmag)
-    }, [props.sector, props.camera, props.ccd])
-
-    console.log(sortedTargets)
 
     return (
         <div style={{ fontFamily: 'sans-serif', padding: '20px' }}>
             <h3>Top 10 Brightest Targets</h3>
-            {sortedTargets.length > 0 ? (
+            {props.targets.length > 0 ? (
                 <table style={{ width: '100%', borderCollapse: 'collapse', border: "none" }}>
                     <thead style={{ textAlign: 'left' }}>
                         <tr>
@@ -39,7 +23,7 @@ const RightPane: React.FC<RightPaneProps> = (props) => {
                         </tr>
                     </thead>
                     <tbody>
-                        {sortedTargets.map((target) => (
+                        {props.targets.map((target) => (
                             <tr key={target.TICID}>
                                 <td style={{ border: '1px solid #ccc', padding: '8px' }}>
                                     <a

@@ -1,11 +1,6 @@
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { TransformComponent, TransformWrapper, useControls } from "react-zoom-pan-pinch"
 import CcdSelector from "./CcdSelector";
-
-const markers: { id: number, x: number, y: number, text: string }[] = [
-    // { id: 1, x: 25, y: 40, text: 'This is Marker 1' },
-    // { id: 2, x: 60, y: 75, text: 'Information for Marker 2' }
-];
 
 interface LeftPaneProps {
     sector: number
@@ -14,9 +9,10 @@ interface LeftPaneProps {
     setCamera: (camera: number) => void
     ccd: number
     setCcd: (ccd: number) => void
+    targets: any[]
 }
 
-const LeftPane: React.FC<LeftPaneProps> = ({ sector, camera, ccd, setSector, setCamera, setCcd }) => {
+const LeftPane: React.FC<LeftPaneProps> = ({ sector, camera, ccd, setSector, setCamera, setCcd, targets }) => {
     const maxSector = 97
 
     const [transformState, setTransformState] = useState({
@@ -26,6 +22,13 @@ const LeftPane: React.FC<LeftPaneProps> = ({ sector, camera, ccd, setSector, set
     });
 
     const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
+
+    const markers: { id: number, x: number, y: number, text: string }[] = useMemo(() => {
+        if (!targets[0].x_percent) {
+            return []
+        }
+        return targets.map(t => ({ id: t.TICID, x: 100 * t.pixel_x / 2136, y: 100 * t.pixel_y / 2078, text: "lol" }))
+    }, [targets, imageDimensions])
 
     useEffect(() => {
         setImageDimensions({ width: 0, height: 0 });
