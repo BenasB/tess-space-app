@@ -12,7 +12,7 @@ function LeftPane() {
     const maxSector = 97
     const [sector, setSector] = useState<number>(1)
 
-    const [camera, setCamera] = useState<number>(1)
+    const [camera, setCamera] = useState<number>(2)
     const [ccd, setCcd] = useState<number>(1)
 
     const [transformState, setTransformState] = useState({
@@ -47,7 +47,7 @@ function LeftPane() {
                 <TransformWrapper
                     wheel={{ smoothStep: .02 }}
                     onTransformed={(_, state) => { setTransformState(state) }}
-                    key={sector}
+                    key={`${sector}-${camera}-${ccd}`}
                 >
                     <Controls sector={sector} />
                     <TransformComponent wrapperStyle={{ position: 'relative', width: '100%', height: '100%' }}>
