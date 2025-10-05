@@ -2,18 +2,22 @@ import { useEffect, useState } from "react"
 import { TransformComponent, TransformWrapper, useControls } from "react-zoom-pan-pinch"
 import CcdSelector from "./CcdSelector";
 
-
 const markers = [
     { id: 1, x: 25, y: 40, text: 'This is Marker 1' },
     { id: 2, x: 60, y: 75, text: 'Information for Marker 2' }
 ];
 
-function LeftPane() {
-    const maxSector = 97
-    const [sector, setSector] = useState<number>(1)
+interface LeftPaneProps {
+    sector: number
+    setSector: (sector: number) => void
+    camera: number
+    setCamera: (camera: number) => void
+    ccd: number
+    setCcd: (ccd: number) => void
+}
 
-    const [camera, setCamera] = useState<number>(2)
-    const [ccd, setCcd] = useState<number>(1)
+const LeftPane: React.FC<LeftPaneProps> = ({ sector, camera, ccd, setSector, setCamera, setCcd }) => {
+    const maxSector = 97
 
     const [transformState, setTransformState] = useState({
         scale: 1,
@@ -29,8 +33,6 @@ function LeftPane() {
 
     const handleMarkerClick = (marker: { text: string }) => {
         alert(`You clicked on: ${marker.text}`);
-        // Here you can implement more complex logic,
-        // like opening a modal or a sidebar with more details.
     };
 
     return (
