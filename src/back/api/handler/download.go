@@ -31,8 +31,42 @@ func (h *ApiHandler) DownloadCCD(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	const cam = 1
-	const ccd = 1
+	camStr := r.URL.Query().Get("camera")
+	if camStr == "" {
+		log.Printf("Missing camera parameter")
+		http.Error(w, "Missing camera parameter", http.StatusBadRequest)
+		return
+	}
+
+	cam, err := strconv.Atoi(camStr)
+	if err != nil {
+		http.Error(w, "Camera must be a number", http.StatusBadRequest)
+		return
+	}
+
+	if cam < 1 || cam > 4 {
+		http.Error(w, "Camera must be between 1 and 4", http.StatusBadRequest)
+		return
+	}
+
+	ccdStr := r.URL.Query().Get("ccd")
+	if ccdStr == "" {
+		log.Printf("Missing ccd parameter")
+		http.Error(w, "Missing ccd parameter", http.StatusBadRequest)
+		return
+	}
+
+	ccd, err := strconv.Atoi(ccdStr)
+	if err != nil {
+		http.Error(w, "Ccd must be a number", http.StatusBadRequest)
+		return
+	}
+
+	if ccd < 1 || ccd > 4 {
+		http.Error(w, "Ccd must be between 1 and 4", http.StatusBadRequest)
+		return
+	}
+
 	info := tessDataMap[sector]
 	resource := fmt.Sprintf("tess%s-s%04d-%d-%d-%s-s_ffic.fits", info.Timestamp, sector, cam, ccd, info.SpacecraftNumber)
 
