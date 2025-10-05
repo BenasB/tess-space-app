@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { TransformComponent, TransformWrapper, useControls } from "react-zoom-pan-pinch"
+import CcdSelector from "./CcdSelector";
 
 
 const markers = [
@@ -10,6 +11,9 @@ const markers = [
 function LeftPane() {
     const maxSector = 97
     const [sector, setSector] = useState<number>(1)
+
+    const [camera, setCamera] = useState<number>(1)
+    const [ccd, setCcd] = useState<number>(1)
 
     const [transformState, setTransformState] = useState({
         scale: 1,
@@ -36,6 +40,9 @@ function LeftPane() {
                 <h1>Sector {sector}</h1>
                 {sector < maxSector && <button style={{ marginLeft: "20px" }} onClick={() => setSector(sector + 1)}>&gt;</button>}
             </div>
+            <div style={{ width: "430px", margin: "15px auto" }}>
+                <CcdSelector camera={camera} setCamera={setCamera} ccd={ccd} setCcd={setCcd} />
+            </div>
             <div style={{ width: "75%", margin: "0 auto", position: "relative", overflow: "hidden" }}>
                 <TransformWrapper
                     wheel={{ smoothStep: .02 }}
@@ -46,7 +53,7 @@ function LeftPane() {
                     <TransformComponent wrapperStyle={{ position: 'relative', width: '100%', height: '100%' }}>
                         <img
                             key={sector}
-                            src={`http://localhost:8081/downloadCCD?sector=${sector}`}
+                            src={`http://localhost:8081/downloadCCD?sector=${sector}&camera=${camera}&ccd=${ccd}`}
                             style={{ maxWidth: "100%" }}
                             onLoad={(ev) => {
                                 const { width, height } = ev.currentTarget;
