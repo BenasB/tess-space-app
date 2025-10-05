@@ -59,3 +59,27 @@ button:hover {
 .non-scaling-marker:hover {
     transform: translate(-50%, -50%) scale(1.5) !important;
 }
+
+/* unvisited link */
+a:link {
+    color: whitesmoke;
+}
+
+/* visited link */
+a:visited {
+    color: whitesmoke;
+}
+
+/* mouse over link */
+a:hover {
+    color: whitesmoke;
+}
+
+/* selected link */
+a:active {
+    color: whitesmoke;
+}
+
+td:nth-of-type(2) {
+    border: 1px solid black;
+}

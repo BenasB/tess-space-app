@@ -2,9 +2,9 @@ import { useEffect, useState } from "react"
 import { TransformComponent, TransformWrapper, useControls } from "react-zoom-pan-pinch"
 import CcdSelector from "./CcdSelector";
 
-const markers = [
-    { id: 1, x: 25, y: 40, text: 'This is Marker 1' },
-    { id: 2, x: 60, y: 75, text: 'Information for Marker 2' }
+const markers: { id: number, x: number, y: number, text: string }[] = [
+    // { id: 1, x: 25, y: 40, text: 'This is Marker 1' },
+    // { id: 2, x: 60, y: 75, text: 'Information for Marker 2' }
 ];
 
 interface LeftPaneProps {

@@ -5,7 +5,7 @@ import RightPane from './RightPane';
 
 function App() {
   const [sector, setSector] = useState<number>(1)
-  const [camera, setCamera] = useState<number>(2)
+  const [camera, setCamera] = useState<number>(1)
   const [ccd, setCcd] = useState<number>(1)
 
   return (
