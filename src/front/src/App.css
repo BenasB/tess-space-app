@@ -1,0 +1,61 @@
+body {
+    margin: 0;
+
+    font-family: "Inter", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: normal;
+    font-style: normal;
+
+    background-color: #1c1c26;
+    color: whitesmoke
+}
+
+p {
+    margin: 0;
+}
+
+.split-screen-container {
+    display: flex;
+    height: 100vh;
+}
+
+.left-pane {
+    width: 50%;
+    border-right: 2px solid #26273a;
+    padding: 5px
+}
+
+.right-pane {
+    width: 50%;
+    padding: 5px
+}
+
+button {
+    background-color: transparent;
+    border: 1px solid whitesmoke;
+    color: whitesmoke;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    font-family: "Inter", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: normal;
+    font-style: normal;
+}
+
+button:hover {
+    background-color: #424259;
+}
+
+.non-scaling-marker {
+    /* This is crucial for positioning */
+    position: absolute;
+    cursor: pointer;
+    /* This centers the marker */
+    transform: translate(-50%, -50%);
+    transition: transform 0.2s ease-in-out;
+}
+
+.non-scaling-marker:hover {
+    transform: translate(-50%, -50%) scale(1.5) !important;
+}
